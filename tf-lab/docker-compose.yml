@@ -1,0 +1,46 @@
+# CPU-only (Docker on macOS has no GPU access). Build once: docker compose build
+x-common: &common
+  build: .
+  image: tf-lab:local
+  environment:
+    TF_CPP_MIN_LOG_LEVEL: "2"
+  volumes:
+    - ./runs:/code/runs
+
+services:
+  # docker compose run --rm train --demo forecast --set data.num_shards=16
+  train:
+    <<: *common
+    profiles: ["train"]
+    entrypoint: ["uv", "run", "--no-sync", "python", "-m", "app.ml.train"]
+    command: ["--demo", "linear", "--set", "distribution.virtual_devices=2"]
+
+  # ADK agent API on :8080; Startup needs no credentials; chatting needs GEMINI_API_KEY in .env, or
+  # GOOGLE_CLOUD_PROJECT + gcloud ADC (mounted below).
+  agent:
+    <<: *common
+    profiles: ["agent"]
+    ports: ["8080:8080"]
+    env_file: [.env]
+    environment:
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      OTEL_TO_CLOUD: "false"   # skip Cloud Trace/Logging export; no ADC needed for startup
+    volumes:
+      - ./runs:/code/runs
+      - ${HOME}/.config/gcloud:/root/.config/gcloud:ro
+
+  # docker compose --profile multiworker up --abort-on-container-exit
+  worker0: &worker
+    <<: *common
+    profiles: ["multiworker"]
+    entrypoint: ["uv", "run", "--no-sync", "python", "-m", "app.ml.train"]
+    environment:
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      TF_CONFIG: '{"cluster":{"worker":["worker0:12345","worker1:12345"]},"task":{"type":"worker","index":0}}'
+    command: ["--demo", "logistic", "--set", "distribution.strategy=multiworker",
+              "--set", "output_dir=/tmp/runs", "--set", "data.dir=/tmp/data"]
+  worker1:
+    <<: *worker
+    environment:
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      TF_CONFIG: '{"cluster":{"worker":["worker0:12345","worker1:12345"]},"task":{"type":"worker","index":1}}'

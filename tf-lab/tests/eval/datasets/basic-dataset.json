@@ -1,0 +1,31 @@
+{
+  "eval_cases": [
+    {
+      "eval_case_id": "greeting",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Hello, what can you help me with?"}]
+      }
+    },
+    {
+      "eval_case_id": "tune_settings",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "Train the linear demo with 16 TFRecord shards and a per-replica batch size of 128."}]
+      }
+    },
+    {
+      "eval_case_id": "capital_lookup",
+      "prompt": {
+        "role": "user",
+        "parts": [{"text": "What is the capital of France?"}]
+      },
+      "reference": {
+        "response": {
+          "role": "model",
+          "parts": [{"text": "The capital of France is Paris."}]
+        }
+      }
+    }
+  ]
+}
