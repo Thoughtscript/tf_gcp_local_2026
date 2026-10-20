@@ -35,7 +35,7 @@ docker compose --profile multiworker up --abort-on-container-exit
 ```
 
 Spin up the Agent:
-1. Get some [Google AI Studio credentials](https://aistudio.google.com/api-keys) and configure [.env](./tf-lab/.env).
+1. Get some [Google AI Studio credentials](https://aistudio.google.com/api-keys) and configure [.env](./tf-lab/.env.example).
     * This is probably the fastest, easiest, cheapest way to do this.
 1. `docker compose --profile agent up` 
 1. http://localhost:8080/dev-ui/
