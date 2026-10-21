@@ -17,6 +17,7 @@ The inbuilt `agents-cli playground` [supports](https://google.github.io/agents-c
 There are some limitations: I've chosen a configuration that's CPU only on a Mac. 
 * For ARM GPU support on newer Macs, one has to use `tensorflow-metal` but it only provides a single GPU backend. It doesn't offer much advantage for this limited demo.
 * I will probably tinker around with some kind of NVIDIA GPU with multiple Linux Containers in the future.
+* I had GitHub Copilot expand and add to the available Agent Tooling: `run_experiment`, `run_tests`.
 
 ## TF Settings
 
